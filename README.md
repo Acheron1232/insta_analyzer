@@ -48,8 +48,8 @@ docker compose -f docker-compose.arm.yml up --build
 ```
 
 Open:
-- UI: `http://localhost/`
-- API example: `http://localhost/api/dashboard/stats`
+- UI: `http://localhost:18081/` (or your `HOST_HTTP_PORT`)
+- API example: `http://localhost:18081/api/dashboard/stats`
 
 ## Hosting on ARM server (GitHub Actions)
 
@@ -74,7 +74,7 @@ What deploy does:
 ## Environment Variables
 
 Use `.env` on server (example in `.env.example`):
-- `HOST_HTTP_PORT` (default `80`, set `8080` if port 80 is already used)
+- `HOST_HTTP_PORT` (default `18081`, set any free port)
 - `IG_USERNAME`
 - `IG_PASSWORD`
 - `RAPIDAPI_KEY`

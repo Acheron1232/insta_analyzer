@@ -85,7 +85,7 @@ jobs:
 
             $DOCKER compose -f docker-compose.arm.yml build --pull backend
             if ! $DOCKER compose -f docker-compose.arm.yml up -d --remove-orphans; then
-              echo "Deploy failed. If port 80 is busy, set HOST_HTTP_PORT=8080 in .env and rerun."
+              echo "Deploy failed. Set HOST_HTTP_PORT to a free port in .env (default is 18081)."
               $DOCKER ps --format 'table {{.Names}}\t{{.Ports}}'
               exit 1
             fi
