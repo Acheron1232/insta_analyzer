@@ -1,6 +1,8 @@
 spring:
   application:
     name: inst_bot
+  config:
+    import: optional:file:.env[.properties]
   web:
     resources:
       static-locations: classpath:/static/,file:./frontend/dist/
