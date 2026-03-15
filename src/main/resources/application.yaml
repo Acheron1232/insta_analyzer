@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: inst_bot
+  web:
+    resources:
+      static-locations: classpath:/static/,file:./frontend/dist/
+  datasource:
+    url: jdbc:sqlite:inst_bot.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+instagram:
+  instagram4j:
+    username: ${IG_USERNAME:}
+    password: ${IG_PASSWORD:}
+  apify:
+    token: ${APIFY_TOKEN:}
+    base-url: https://api.apify.com/v2
+  rapidapi:
+    key: ${RAPIDAPI_KEY:}
+    host: ${RAPIDAPI_HOST:instagram-scraper-api2.p.rapidapi.com}
+
+ai:
+  ollama:
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: ${OLLAMA_MODEL:llama3.1:8b}
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
+
+analysis:
+  min-followers: 3000
+  max-followers: 50000
+  lead-score-threshold: 70
+  request-delay-ms: 2000
+  ai-batch-size: 20

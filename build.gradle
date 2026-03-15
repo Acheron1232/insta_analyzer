@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.acheron'
+version = '0.0.1-SNAPSHOT'
+description = 'inst_bot'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // SQLite
+    implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+    implementation 'org.hibernate.orm:hibernate-community-dialects'
+
+    // Instagram4j (unofficial Instagram API)
+    implementation 'com.github.instagram4j:instagram4j:2.0.7'
+
+    // Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+def frontendDir = file("$projectDir/frontend")
+
+tasks.register('frontendBuild', Exec) {
+    group = 'build'
+    description = 'Build frontend assets for single-server mode'
+    workingDir frontendDir
+    commandLine 'sh', '-c', 'if [ ! -d node_modules ]; then npm ci; fi && npm run build'
+    inputs.file("$frontendDir/package.json")
+    inputs.file("$frontendDir/package-lock.json")
+    inputs.dir("$frontendDir/src")
+    inputs.file("$frontendDir/index.html")
+    outputs.dir("$frontendDir/dist")
+}
+
+tasks.named('bootRun') {
+    dependsOn tasks.named('frontendBuild')
+}

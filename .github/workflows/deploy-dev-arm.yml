@@ -1,0 +1,75 @@
+name: Deploy to DEV (ARM Native)
+
+on:
+  push:
+    branches:
+      - dev_backend
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create deploy archive
+        run: |
+          tar -czf inst_bot.tar.gz \
+            --exclude=.git \
+            --exclude=.github \
+            --exclude=.gradle \
+            --exclude=.idea \
+            --exclude=build \
+            --exclude=bin \
+            --exclude=inst_bot.db \
+            --exclude=frontend/node_modules \
+            --exclude=frontend/dist \
+            .
+
+      - name: Upload archive to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          source: inst_bot.tar.gz
+          target: ${{ secrets.DEV_DEPLOY_PATH }}
+
+      - name: Deploy on ARM server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+
+            mkdir -p "${{ secrets.DEV_DEPLOY_PATH }}"
+            cd "${{ secrets.DEV_DEPLOY_PATH }}"
+
+            find . -mindepth 1 -maxdepth 1 \
+              ! -name ".env" \
+              ! -name "data" \
+              ! -name "inst_bot.tar.gz" \
+              -exec rm -rf {} +
+
+            tar -xzf inst_bot.tar.gz
+            rm -f inst_bot.tar.gz
+
+            # Keep real values in .env on server. If missing, bootstrap from template.
+            if [ ! -f .env ] && [ -f .env.example ]; then
+              cp .env.example .env
+            fi
+
+            # ARM-native build on the ARM host (no QEMU emulation).
+            export DOCKER_BUILDKIT=1
+            export COMPOSE_DOCKER_CLI_BUILD=1
+
+            docker compose -f docker-compose.arm.yml build --pull backend
+            docker compose -f docker-compose.arm.yml up -d --remove-orphans
+
+            docker image prune -f
