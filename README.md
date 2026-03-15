@@ -68,8 +68,9 @@ Required GitHub secrets:
 What deploy does:
 1. Uploads project archive to ARM server.
 2. Preserves `.env` and `data/`.
-3. Builds backend image natively on ARM (no QEMU emulation).
-4. Starts/updates service via `docker compose -f docker-compose.arm.yml up -d`.
+3. Fixes write permissions on `data/` for SQLite.
+4. Builds backend image natively on ARM (no QEMU emulation).
+5. Starts/updates service via `docker compose -f docker-compose.arm.yml up -d`.
 
 ## Environment Variables
 

@@ -83,6 +83,11 @@ jobs:
               fi
             fi
 
+            mkdir -p data
+            # Ensure SQLite bind volume is writable by container user (uid/gid 10001).
+            $DOCKER run --rm -v "$PWD/data:/data" alpine:3.20 sh -c \
+              "mkdir -p /data && chown -R 10001:10001 /data && chmod -R ug+rwX /data"
+
             $DOCKER compose -f docker-compose.arm.yml build --pull backend
             if ! $DOCKER compose -f docker-compose.arm.yml up -d --remove-orphans; then
               echo "Deploy failed. Set HOST_HTTP_PORT to a free port in .env (default is 18081)."

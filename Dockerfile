@@ -26,7 +26,7 @@ RUN ./gradlew bootJar --no-daemon
 FROM eclipse-temurin:25-jdk
 WORKDIR /app
 
-RUN groupadd --system app && useradd --system --gid app app
+RUN groupadd --gid 10001 --system app && useradd --uid 10001 --gid app --system app
 
 COPY --from=builder /workspace/build/libs/*.jar /app/app.jar
 
