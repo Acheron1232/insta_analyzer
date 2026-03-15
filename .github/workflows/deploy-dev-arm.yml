@@ -73,7 +73,17 @@ jobs:
             export DOCKER_BUILDKIT=1
             export COMPOSE_DOCKER_CLI_BUILD=1
 
-            docker compose -f docker-compose.arm.yml build --pull backend
-            docker compose -f docker-compose.arm.yml up -d --remove-orphans
+            DOCKER="docker"
+            if ! docker info >/dev/null 2>&1; then
+              if sudo -n docker info >/dev/null 2>&1; then
+                DOCKER="sudo -n docker"
+              else
+                echo "No Docker access. Configure docker group or passwordless sudo for this user."
+                exit 1
+              fi
+            fi
 
-            docker image prune -f
+            $DOCKER compose -f docker-compose.arm.yml build --pull backend
+            $DOCKER compose -f docker-compose.arm.yml up -d --remove-orphans
+
+            $DOCKER image prune -f
