@@ -18,7 +18,9 @@ jobs:
 
       - name: Create deploy archive
         run: |
-          tar -czf inst_bot.tar.gz \
+          ARCHIVE_PATH="${RUNNER_TEMP}/inst_bot_${GITHUB_SHA}.tar.gz"
+
+          tar -czf "$ARCHIVE_PATH" \
             --exclude=.git \
             --exclude=.github \
             --exclude=.gradle \
@@ -29,6 +31,8 @@ jobs:
             --exclude=frontend/node_modules \
             --exclude=frontend/dist \
             .
+
+          cp "$ARCHIVE_PATH" inst_bot.tar.gz
 
       - name: Upload archive to server
         uses: appleboy/scp-action@v0.1.7
