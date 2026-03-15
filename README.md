@@ -74,6 +74,7 @@ What deploy does:
 ## Environment Variables
 
 Use `.env` on server (example in `.env.example`):
+- `HOST_HTTP_PORT` (default `80`, set `8080` if port 80 is already used)
 - `IG_USERNAME`
 - `IG_PASSWORD`
 - `RAPIDAPI_KEY`
